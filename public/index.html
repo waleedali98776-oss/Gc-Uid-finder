@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhatsApp UID Tool</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+  
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    color: #e2e8f0;
+    padding: 20px;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(34,197,94,0.1) 0%, transparent 70%);
+    animation: rotate 30s linear infinite;
+    z-index: 0;
+  }
+
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header {
+    text-align: center;
+    padding: 30px 20px;
+    margin-bottom: 30px;
+  }
+
+  .header h1 {
+    font-size: 2.5rem;
+    background: linear-gradient(90deg, #22c55e, #10b981, #06b6d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+    font-weight: 800;
+  }
+
+  .header p {
+    color: #94a3b8;
+    font-size: 1rem;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 50px;
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(255,255,255,0.1);
+    margin-top: 15px;
+    font-size: 0.9rem;
+  }
+
+  .status-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #ef4444;
+    animation: pulse 2s infinite;
+  }
+
+  .status-dot.connected { background: #22c55e; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+  }
+
+  .card {
+    background: rgba(30, 41, 59, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+
+  .card h2 {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #22c55e;
+  }
+
+  .pairing-section {
+    text-align: center;
+  }
+
+  .input-group {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  input {
+    padding: 14px 20px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    color: #e2e8f0;
+    font-size: 1rem;
+    width: 280px;
+    outline: none;
+    transition: all 0.3s;
+  }
+
+  input:focus {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.2);
+  }
+
+  button {
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #22c55e, #10b981);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(34,197,94,0.4);
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+  }
+
+  .code-display {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.8);
+    border-radius: 12px;
+    margin: 20px 0;
+    color: #22c55e;
+    font-family: 'Courier New', monospace;
+    border: 2px dashed rgba(34,197,94,0.3);
+  }
+
+  .info-text {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    margin-top: 10px;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .stat-box {
+    background: rgba(15, 23, 42, 0.6);
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.05);
+    text-align: center;
+  }
+
+  .stat-box .num {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #22c55e;
+  }
+
+  .stat-box .label {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    margin-top: 5px;
+  }
+
+  .search-box {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+
+  .list-container {
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 5px;
+  }
+
+  .list-container::-webkit-scrollbar { width: 6px; }
+  .list-container::-webkit-scrollbar-track { background: rgba(15,23,42,0.5); border-radius: 3px; }
+  .list-container::-webkit-scrollbar-thumb { background: #22c55e; border-radius: 3px; }
+
+  .list-item {
+    background: rgba(15, 23, 42, 0.6);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .list-item:hover {
+    border-color: rgba(34,197,94,0.3);
+    transform: translateX(5px);
+  }
+
+  .list-item .name {
+    font-weight: 600;
+    color: #e2e8f0;
+    margin-bottom: 5px;
+  }
+
+  .list-item .uid {
+    font-size: 0.85rem;
+    color: #22c55e;
+    font-family: 'Courier New', monospace;
+    word-break: break-all;
+  }
+
+  .list-item .meta {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-top: 5px;
+  }
+
+  .copy-btn {
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    background: rgba(34,197,94,0.2);
+    border: 1px solid rgba(34,197,94,0.3);
+    margin-top: 8px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 10px 20px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: #94a3b8;
+  }
+
+  .tab.active {
+    background: linear-gradient(135deg, #22c55e, #10b981);
+    color: white;
+    border-color: transparent;
+  }
+
+  .hidden { display: none; }
+
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 15px 25px;
+    background: rgba(34,197,94,0.9);
+    color: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    transform: translateX(400px);
+    transition: transform 0.3s;
+    z-index: 1000;
+  }
+
+  .toast.show { transform: translateX(0); }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #64748b;
+  }
+
+  .empty-state .icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+  }
+
+  @media (max-width: 600px) {
+    .header h1 { font-size: 1.8rem; }
+    .code-display { font-size: 1.3rem; letter-spacing: 2px; }
+    input { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>⚡ WhatsApp UID Tool</h1>
+    <p>Modern tool to fetch WhatsApp UIDs & Groups via Pairing Code</p>
+    <div class="status-badge">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">Disconnected</span>
+    </div>
+  </div>
+
+  <!-- Pairing Card -->
+  <div class="card" id="pairingCard">
+    <h2>🔗 Pair Your WhatsApp</h2>
+    <div class="pairing-section">
+      <p class="info-text">Enter your phone number with country code (e.g., 923001234567)</p>
+      <div class="input-group">
+        <input type="text" id="phoneInput" placeholder="923001234567" maxlength="15">
+        <button id="pairBtn" onclick="requestPair()">Get Pairing Code</button>
+      </div>
+      <div id="codeBox" class="hidden">
+        <p class="info-text">📱 Open WhatsApp → Settings → Linked Devices → Link a Device</p>
+        <div class="code-display" id="pairingCode">XXXX-XXXX</div>
+        <p class="info-text">Code expires in 60 seconds. Click button to regenerate.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Connected Section -->
+  <div id="connectedSection" class="hidden">
+    <div class="stats">
+      <div class="stat-box">
+        <div class="num" id="userNum">-</div>
+        <div class="label">Connected Number</div>
+      </div>
+      <div class="stat-box">
+        <div class="num" id="contactsCount">0</div>
+        <div class="label">Contacts</div>
+      </div>
+      <div class="stat-box">
+        <div class="num" id="groupsCount">0</div>
+        <div class="label">Groups</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('contacts')">👥 Contacts</div>
+        <div class="tab" onclick="switchTab('groups')">👨‍👩‍👧 Groups</div>
+      </div>
+
+      <input type="text" class="search-box" id="searchInput" placeholder="🔍 Search by name or UID..." oninput="filterList()">
+
+      <div id="contactsList" class="list-container"></div>
+      <div id="groupsList" class="list-container hidden"></div>
+    </div>
+
+    <div class="card" style="text-align:center;">
+      <button class="btn-danger" onclick="logout()">🚪 Logout & Disconnect</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Copied!</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+let allContacts = [];
+let allGroups = [];
+let currentTab = 'contacts';
+
+socket.on('connection-status', (data) => {
+  const dot = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+  if (data.connection === 'open') {
+    dot.classList.add('connected');
+    text.textContent = 'Connected';
+  } else {
+    dot.classList.remove('connected');
+    text.textContent = 'Disconnected';
+  }
+});
+
+socket.on('pairing-code', (data) => {
+  document.getElementById('pairingCode').textContent = data.code;
+  document.getElementById('codeBox').classList.remove('hidden');
+  document.getElementById('pairBtn').disabled = false;
+  document.getElementById('pairBtn').textContent = 'Regenerate Code';
+});
+
+socket.on('data-loaded', (data) => {
+  allContacts = data.contacts || [];
+  allGroups = data.groups || [];
+  document.getElementById('userNum').textContent = data.user?.id?.split('@')[0] || '-';
+  document.getElementById('contactsCount').textContent = allContacts.length;
+  document.getElementById('groupsCount').textContent = allGroups.length;
+  document.getElementById('pairingCard').classList.add('hidden');
+  document.getElementById('connectedSection').classList.remove('hidden');
+  renderContacts();
+  renderGroups();
+});
+
+socket.on('connected', (data) => {
+  document.getElementById('statusDot').classList.add('connected');
+  document.getElementById('statusText').textContent = 'Connected';
+});
+
+socket.on('logged-out', () => {
+  location.reload();
+});
+
+async function requestPair() {
+  const phone = document.getElementById('phoneInput').value.trim();
+  if (!phone) return showToast('Enter phone number!');
+  
+  const btn = document.getElementById('pairBtn');
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+  
+  try {
+    const res = await fetch('/api/pair', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+  } catch (err) {
+    showToast('Error: ' + err.message);
+    btn.disabled = false;
+    btn.textContent = 'Get Pairing Code';
+  }
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('contactsList').classList.toggle('hidden', tab !== 'contacts');
+  document.getElementById('groupsList').classList.toggle('hidden', tab !== 'groups');
+}
+
+function renderContacts() {
+  const container = document.getElementById('contactsList');
+  if (allContacts.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">📭</div>No contacts found</div>';
+    return;
+  }
+  container.innerHTML = allContacts.map(c => `
+    <div class="list-item" data-search="${c.name.toLowerCase()} ${c.uid}">
+      <div class="name">${escapeHtml(c.name)}</div>
+      <div class="uid">${c.id}</div>
+      <button class="copy-btn" onclick="copyText('${c.id}')">📋 Copy UID</button>
+    </div>
+  `).join('');
+}
+
+function renderGroups() {
+  const container = document.getElementById('groupsList');
+  if (allGroups.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">👥</div>No groups found</div>';
+    return;
+  }
+  container.innerHTML = allGroups.map(g => `
+    <div class="list-item">
+      <div class="name">${escapeHtml(g.subject)}</div>
+      <div class="uid">${g.id}</div>
+      <div class="meta">👤 ${g.participants} members ${g.owner ? '• Owner: ' + g.owner.split('@')[0] : ''}</div>
+      <button class="copy-btn" onclick="copyText('${g.id}')">📋 Copy Group ID</button>
+    </div>
+  `).join('');
+}
+
+function filterList() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  document.querySelectorAll('.list-item').forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(q) ? '' : 'none';
+  });
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text);
+  showToast('✅ Copied: ' + text);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function escapeHtml(s) {
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+async function logout() {
+  if (!confirm('Are you sure you want to logout?')) return;
+  await fetch('/api/logout', { method: 'POST' });
+  location.reload();
+}
+</script>
+</body>
+</html>
