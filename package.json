@@ -1,0 +1,21 @@
+{
+  "name": "whatsapp-uid-tool",
+  "version": "1.0.0",
+  "description": "Modern WhatsApp UID & Group Tool with Pairing Code",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "keywords": ["whatsapp", "baileys", "pairing", "uid"],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.9",
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5",
+    "pino": "^9.3.2",
+    "qrcode-terminal": "^0.12.0",
+    "node-cache": "^5.1.2"
+  }
+}
